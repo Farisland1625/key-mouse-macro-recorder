@@ -1,0 +1,3 @@
+# Runtime dependencies: Python standard library, Tkinter, and Windows ctypes.
+# PyInstaller is only needed when building the optional standalone executable.
+pyinstaller>=6.0,<7

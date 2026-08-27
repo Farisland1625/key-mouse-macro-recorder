@@ -1,0 +1,26 @@
+# Local instructions and machine-specific files
+AGENTS.md
+agents.md
+.env
+.env.*
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+.venv_user/
+
+# PyInstaller outputs
+build/
+dist/
+
+# Local recordings may contain coordinates and keyboard input.
+macros/
+
+# Logs and editor metadata
+*.log
+.idea/
+.vscode/

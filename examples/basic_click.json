@@ -1,0 +1,31 @@
+{
+  "app": "KeyMouse Macro Recorder",
+  "version": "2.0.0",
+  "schema_version": 2,
+  "created_at": "2026-01-01T00:00:00",
+  "record_mouse_moves": false,
+  "screen": {
+    "left": 0,
+    "top": 0,
+    "width": 1920,
+    "height": 1080
+  },
+  "events": [
+    {
+      "kind": "mouse",
+      "message": 513,
+      "x": 960,
+      "y": 540,
+      "data": 0,
+      "t": 0.0
+    },
+    {
+      "kind": "mouse",
+      "message": 514,
+      "x": 960,
+      "y": 540,
+      "data": 0,
+      "t": 0.08
+    }
+  ]
+}
