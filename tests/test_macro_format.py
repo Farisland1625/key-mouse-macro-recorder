@@ -108,6 +108,24 @@ class MacroFormatTests(unittest.TestCase):
         self.assertEqual([event["vk"] for event in moved], [66, 65, 67])
         self.assertEqual([event["t"] for event in moved], [0.0, 1.0, 3.0])
 
+    def test_move_event_to_supports_dragging_across_multiple_slots(self):
+        events = [
+            {"kind": "key", "t": 0.0, "vk": 65, "action": "down"},
+            {"kind": "key", "t": 0.5, "vk": 66, "action": "down"},
+            {"kind": "key", "t": 2.0, "vk": 67, "action": "down"},
+            {"kind": "key", "t": 4.0, "vk": 68, "action": "down"},
+        ]
+        moved = macro_recorder.move_event_to(events, 0, 3)
+        self.assertEqual([event["vk"] for event in moved], [66, 67, 68, 65])
+        self.assertEqual([event["t"] for event in moved], [0.0, 0.5, 2.0, 4.0])
+        self.assertEqual([event["vk"] for event in events], [65, 66, 67, 68])
+
+    def test_move_list_item_supports_composer_drag_order(self):
+        items = [{"name": "first"}, {"name": "second"}, {"name": "third"}]
+        reordered = macro_recorder.move_list_item(items, 2, 0)
+        self.assertEqual([item["name"] for item in reordered], ["third", "first", "second"])
+        self.assertEqual([item["name"] for item in items], ["first", "second", "third"])
+
     def test_invalid_event_is_rejected(self):
         with self.assertRaises(ValueError):
             macro_recorder.validate_events([{"kind": "unknown", "t": 0}])

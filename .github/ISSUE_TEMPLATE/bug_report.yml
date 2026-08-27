@@ -30,7 +30,7 @@ body:
     attributes:
       label: Application version / 应用版本
       description: Use the GitHub Release tag, commit SHA, or write "source main". / 请填写 Release 标签、提交 SHA，或填写“source main”。
-      placeholder: v2.0.0
+      placeholder: v2.1.0
     validations:
       required: true
 

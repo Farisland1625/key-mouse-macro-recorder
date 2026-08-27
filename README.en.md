@@ -16,7 +16,7 @@ KeyMouse Macro Recorder does not treat recordings as an unchangeable black box. 
 
 - Select any event to edit its time, action type, and parameters.
 - Insert keyboard press/release, mouse movement, mouse button press/release, and vertical or horizontal scroll events directly.
-- Copy, delete, move events up or down, and verify them with single-step playback.
+- Drag events directly to reorder them, or copy, delete, move them up or down, and verify them with single-step playback.
 - Remove all mouse movement events with one click while preserving clicks, scrolling, and keyboard actions at their original screen coordinates.
 - Undo and redo up to 20 recent edits with `Ctrl+Z` and `Ctrl+Y`.
 
@@ -26,7 +26,7 @@ Complex operations do not need to become one long, difficult-to-maintain macro. 
 
 - Add the same macro or different macros in any order.
 - Set an independent playback count for each item.
-- Move or remove items and see the combined event count and duration immediately.
+- Drag macro files to reorder the composition, or move and remove items with the buttons while seeing the combined event count and duration immediately.
 - Map mouse coordinates from source macros to the current virtual desktop when monitor layouts differ.
 
 ## High-precision recording and playback
@@ -64,7 +64,7 @@ Download the standalone `KeyMouseMacroRecorder.exe` from [GitHub Releases](https
 
 1. Press `F8` to start recording, then press `F8` again to stop.
 2. Select an event on the timeline to inspect or edit its time, action, and parameters.
-3. Use **Insert event** to add missing steps, or copy, move, and delete existing steps.
+3. Use **Insert event** to add missing steps, or drag, copy, move, and delete existing steps.
 4. Verify the selected event with **Single-step playback**, then click **Save** to write the macro to JSON.
 5. Choose the playback speed and repeat mode, then press `F9` to start playback.
 6. During playback, press `F9` to pause or resume and `F10` to stop recording or playback.
@@ -76,7 +76,7 @@ See [`examples/basic_click.json`](examples/basic_click.json) for a sanitized for
 1. Record, edit, and save the short macros you want to reuse.
 2. Click **Multi-file composition** in the top toolbar.
 3. Add macro files in execution order; the same file can be added more than once.
-4. Set the playback count for each item, then move or remove items as needed.
+4. Set the playback count for each item, then drag to reorder or use the move and remove buttons as needed.
 5. Save the composition. The application creates a new schema 2 macro file and leaves every source file unchanged.
 
 ## Macro format and privacy
@@ -119,7 +119,7 @@ The output is `dist\KeyMouseMacroRecorder.exe`. The `build/`, `dist/`, and virtu
 .\.venv_user\Scripts\python.exe -m py_compile macro_recorder.py tests\test_macro_format.py
 ```
 
-The current baseline contains 41 core logic tests and has been verified with a PyInstaller one-file build. GitHub Actions runs the tests and syntax checks on Python 3.10 and 3.12 for pushes and Pull Requests, and verifies the one-file build on Python 3.12.
+The current baseline contains 43 core logic tests and has been verified with a PyInstaller one-file build. GitHub Actions runs the tests and syntax checks on Python 3.10 and 3.12 for pushes and Pull Requests, and verifies the one-file build on Python 3.12.
 
 Reproducible bug reports, accuracy cases, timeline editing suggestions, and UI improvements are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before contributing code, and report security issues privately as described in [`SECURITY.md`](SECURITY.md).
 

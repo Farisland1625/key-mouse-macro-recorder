@@ -14,7 +14,7 @@ from tkinter import filedialog, messagebox, ttk
 
 
 APP_NAME = "KeyMouse Macro Recorder"
-VERSION = "2.0.0"
+VERSION = "2.1.0"
 SCHEMA_VERSION = 2
 UNDO_LIMIT = 20
 SPEED_MIN = 0.01
@@ -118,6 +118,23 @@ def parse_repeat_settings(mode, text):
     if not value or not value.isdigit() or int(value) < 1:
         raise ValueError("重复次数必须是大于等于 1 的整数")
     return int(value)
+
+
+def move_list_item(items, source_index, target_index):
+    """Return a copy with one item moved to another list position."""
+    reordered = list(items)
+    if (
+        isinstance(source_index, bool)
+        or isinstance(target_index, bool)
+        or not isinstance(source_index, int)
+        or not isinstance(target_index, int)
+    ):
+        raise ValueError("无效的拖动位置")
+    if not (0 <= source_index < len(reordered)) or not (0 <= target_index < len(reordered)):
+        return reordered
+    if source_index != target_index:
+        reordered.insert(target_index, reordered.pop(source_index))
+    return reordered
 
 
 def compose_macro_events(sequence, target_screen=None):
@@ -595,28 +612,128 @@ def delete_mouse_moves(events):
 
 def move_event(events, index, direction):
     """Move one event by one slot while keeping timeline starts monotonic."""
-    normalized = validate_events(events)
     if not isinstance(index, int) or direction not in (-1, 1):
         raise ValueError("无效的事件位置")
-    target = index + direction
-    if index < 0 or target < 0 or target >= len(normalized):
+    return move_event_to(events, index, index + direction)
+
+
+def move_event_to(events, source_index, target_index):
+    """Move an event to any slot while preserving the timeline's time slots."""
+    normalized = validate_events(events)
+    if (
+        isinstance(source_index, bool)
+        or isinstance(target_index, bool)
+        or not isinstance(source_index, int)
+        or not isinstance(target_index, int)
+    ):
+        raise ValueError("无效的事件位置")
+    if not (0 <= source_index < len(normalized)) or not (0 <= target_index < len(normalized)):
         return normalized
 
-    # Keep each list position's original start time as its slot so reordering
-    # changes event order without erasing the user's timeline gaps.
-    slot_times = (normalized[index]["t"], normalized[target]["t"])
-    normalized[index], normalized[target] = normalized[target], normalized[index]
-    normalized[index]["t"], normalized[target]["t"] = slot_times
-    start = min(index, target)
-    for position in range(start, len(normalized)):
-        previous_end = event_end_time(normalized[position - 1]) if position else 0.0
-        current_time = float(normalized[position].get("t", 0.0))
-        if current_time >= previous_end:
-            continue
-        shift = previous_end - current_time
-        for following in normalized[position:]:
-            following["t"] = float(following.get("t", 0.0)) + shift
-    return validate_events(normalized)
+    # Ordering is edited independently from timing: each visual row keeps its
+    # original timestamp, so dragging does not erase or invent playback gaps.
+    slot_times = [event["t"] for event in normalized]
+    reordered = move_list_item(normalized, source_index, target_index)
+    for event, timestamp in zip(reordered, slot_times):
+        event["t"] = timestamp
+    return validate_events(reordered)
+
+
+def bind_treeview_drag_reorder(tree, item_count, on_reorder, enabled=None):
+    """Add row drag-and-drop reordering to a numeric-iid Treeview."""
+    enabled = enabled or (lambda: True)
+    state = {"source": None, "target": None}
+    drag_tag = "drag_target"
+
+    def row_index_at(y):
+        children = tree.get_children()
+        if not children:
+            return None
+        row = tree.identify_row(y)
+        if row in children:
+            return children.index(row)
+        visible = []
+        for index, child in enumerate(children):
+            bounds = tree.bbox(child)
+            if bounds:
+                visible.append((index, bounds))
+        if not visible:
+            return None
+        first_index, first_bounds = visible[0]
+        last_index, last_bounds = visible[-1]
+        if y < first_bounds[1]:
+            return first_index
+        if y >= last_bounds[1] + last_bounds[3]:
+            return last_index
+        return None
+
+    def set_target(index):
+        previous = state["target"]
+        if previous == index:
+            return
+        for position in (previous, index):
+            if position is None:
+                continue
+            iid = str(position)
+            if not tree.exists(iid):
+                continue
+            tags = tuple(tag for tag in tree.item(iid, "tags") if tag != drag_tag)
+            if position == index:
+                tags += (drag_tag,)
+            tree.item(iid, tags=tags)
+        state["target"] = index
+
+    def clear_drag():
+        set_target(None)
+        state["source"] = None
+        state["target"] = None
+        try:
+            tree.configure(cursor="")
+        except tk.TclError:
+            pass
+
+    def on_press(event):
+        clear_drag()
+        if not enabled() or tree.identify_region(event.x, event.y) != "cell":
+            return None
+        source = row_index_at(event.y)
+        if source is None or source >= item_count():
+            return None
+        iid = str(source)
+        tree.selection_set(iid)
+        tree.focus(iid)
+        tree.focus_set()
+        state["source"] = source
+        state["target"] = source
+        tree.configure(cursor="fleur")
+        return "break"
+
+    def on_motion(event):
+        if state["source"] is None:
+            return None
+        height = max(1, tree.winfo_height())
+        threshold = min(42, max(18, height // 12))
+        if event.y < threshold:
+            tree.yview_scroll(-1, "units")
+        elif event.y > height - threshold:
+            tree.yview_scroll(1, "units")
+        target = row_index_at(event.y)
+        if target is not None and target < item_count():
+            set_target(target)
+        return "break"
+
+    def on_release(_event):
+        source = state["source"]
+        target = state["target"]
+        clear_drag()
+        if source is not None and target is not None and source != target and enabled():
+            on_reorder(source, target)
+        return "break" if source is not None else None
+
+    tree.bind("<ButtonPress-1>", on_press, add="+")
+    tree.bind("<B1-Motion>", on_motion, add="+")
+    tree.bind("<ButtonRelease-1>", on_release, add="+")
+    return state
 
 
 def load_macro_payload(path):
@@ -1388,6 +1505,7 @@ class MacroApp:
 
         self.tree.tag_configure("even", background=colors["surface"])
         self.tree.tag_configure("odd", background="#1b2028")
+        self.tree.tag_configure("drag_target", background=colors["blue"], foreground="#ffffff")
         scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.tree.yview)
         scrollbar.pack(side="right", fill="y")
         self.tree.configure(yscrollcommand=scrollbar.set)
@@ -1397,6 +1515,12 @@ class MacroApp:
 
         self.tree.bind("<<TreeviewSelect>>", self._on_tree_select)
         self.tree.bind("<Double-1>", lambda _event: self.apply_selected())
+        self._timeline_drag = bind_treeview_drag_reorder(
+            self.tree,
+            lambda: len(self.events),
+            self._move_event_to,
+            enabled=lambda: not self.recording and not self.playing,
+        )
 
         ttk.Label(inspector, text="事件属性", style="Title.TLabel").pack(anchor="w")
         self.inspector_hint = ttk.Label(inspector, text="在时间轴中选择一个事件", style="Subtle.TLabel")
@@ -2350,13 +2474,17 @@ class MacroApp:
     def _move_selected(self, direction):
         if self.selected_index is None or self.recording or self.playing:
             return
-        target = self.selected_index + direction
+        self._move_event_to(self.selected_index, self.selected_index + direction)
+
+    def _move_event_to(self, source, target):
+        if self.recording or self.playing:
+            return
         with self.events_lock:
-            if target < 0 or target >= len(self.events):
+            if source == target or not (0 <= source < len(self.events)) or not (0 <= target < len(self.events)):
                 return
         self._push_undo()
         with self.events_lock:
-            self.events = move_event(self.events, self.selected_index, direction)
+            self.events = move_event_to(self.events, source, target)
         self.selected_index = target
         self.selected_indices = [target]
         self.dirty = True
@@ -2663,7 +2791,7 @@ class MacroApp:
         ttk.Label(body, text="编排宏", style="Title.TLabel", font=title_font).grid(row=0, column=0, sticky="w")
         ttk.Label(
             body,
-            text="按播放顺序加入宏文件，为每一项设置次数；同一个文件可以在不同位置重复加入。",
+            text="按播放顺序加入宏文件，为每一项设置次数；可按住列表项拖动排序。",
             style="Subtle.TLabel",
             font=text_font,
         ).grid(row=1, column=0, sticky="w", pady=(3, 12))
@@ -2797,16 +2925,20 @@ class MacroApp:
             if not items:
                 on_select()
 
-        def move_selected(direction):
-            index = selected_index()
-            if index is None:
+        def move_composer_item(source, target):
+            if self.recording or self.playing:
                 return
-            target = index + direction
-            if target < 0 or target >= len(items):
+            if source == target or not (0 <= source < len(items)) or not (0 <= target < len(items)):
                 return
-            items[index], items[target] = items[target], items[index]
+            items[:] = move_list_item(items, source, target)
             current_index[0] = None
             refresh(target)
+            on_select()
+
+        def move_selected(direction):
+            index = selected_index()
+            if index is not None:
+                move_composer_item(index, index + direction)
 
         ttk.Button(tools, text="＋ 加入宏文件", style="Accent.TButton", command=add_files).pack(side="left")
         ttk.Button(tools, text="上移", style="Compact.TButton", command=lambda: move_selected(-1)).pack(side="left", padx=(8, 3))
@@ -2888,6 +3020,13 @@ class MacroApp:
         tree.bind("<<TreeviewSelect>>", on_select)
         tree.tag_configure("even", background="#151c24")
         tree.tag_configure("odd", background="#1b2028")
+        tree.tag_configure("drag_target", background="#3d668a", foreground="#ffffff")
+        bind_treeview_drag_reorder(
+            tree,
+            lambda: len(items),
+            move_composer_item,
+            enabled=lambda: not self.recording and not self.playing,
+        )
         buttons = ttk.Frame(body)
         buttons.grid(row=6, column=0, sticky="ew", pady=(14, 0))
         ttk.Button(buttons, text="取消", command=dialog.destroy).pack(side="right", padx=(8, 0))
