@@ -32,7 +32,7 @@ KeyMouse Macro Recorder 不把录制结果当成不可修改的黑盒。每一�
 - 保存录制时的虚拟桌面边界，并在显示器排列或尺寸变化时映射鼠标坐标。
 - 支持 0.01x–20x 速度、指定次数或持续循环，以及播放中的暂停、继续和停止。
 
-## 轻量部署 | Python 标准库 + Tkinter + Windows `ctypes`；打包 exe 约 11 MB |
+## 轻量部署：Python 标准库 + Tkinter + Windows ctypes，打包 exe 约 11 MB 
 
 ## 界面预览
 
