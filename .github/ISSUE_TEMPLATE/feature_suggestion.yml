@@ -1,0 +1,67 @@
+name: Feature suggestion / 功能建议
+description: Suggest an improvement that fits a lightweight, reliable Windows macro recorder. / 建议符合轻量、可靠 Windows 宏工具定位的改进。
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing an idea. The project prioritizes recording accuracy, reliable playback, editable events, and a low-learning-cost desktop experience over having the largest feature set.
+
+        感谢你的建议。本项目优先提升录制准确性、回放可靠性、事件编辑能力和低学习成本的桌面体验，不以功能最多为目标。
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting / 提交前确认
+      options:
+        - label: I searched existing issues and did not find the same suggestion. / 我已搜索现有 Issue，未发现相同建议。
+          required: true
+        - label: This suggestion is for the visible Windows desktop application. / 此建议面向用户可见的 Windows 桌面应用。
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case / 问题或使用场景
+      description: Describe what is difficult today and who would benefit. / 请说明当前遇到的困难以及受益用户。
+      placeholder: When I edit a long macro, it is difficult to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement / 建议方案
+      description: Explain the desired user-visible behavior rather than only naming a technology. / 请说明期望的用户可见行为，而不只是技术名称。
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered / 考虑过的替代方案
+      description: Describe any workaround you use today. / 请说明当前使用的替代办法。
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Main area / 主要范围
+      options:
+        - Recording accuracy / 录制准确性
+        - Playback reliability / 回放可靠性
+        - Timeline editing / 时间轴编辑
+        - Multi-file composition / 多文件编排
+        - User interface / 用户界面
+        - Macro file format / 宏文件格式
+        - Packaging or documentation / 打包或文档
+        - Other / 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context or mockups / 补充信息或示意图
+      description: Remove sensitive information before attaching screenshots or files. / 附加截图或文件前请移除敏感信息。

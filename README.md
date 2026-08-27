@@ -58,7 +58,7 @@ Tkinter 通常随 Windows 版 Python 一起安装。程序运行时只使用 Pyt
 
 ### 使用发布版
 
-首个正式 GitHub Release 尚未发布。发布后可从仓库的 Releases 页面下载单文件 `KeyMouseMacroRecorder.exe`，无需安装 Python。
+从 [GitHub Releases](https://github.com/Farisland1625/key-mouse-macro-recorder/releases/latest) 下载单文件 `KeyMouseMacroRecorder.exe`，无需安装 Python。
 
 ### 完成第一个可编辑宏
 

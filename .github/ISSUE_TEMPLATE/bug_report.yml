@@ -1,0 +1,92 @@
+name: Bug report / 问题报告
+description: Report a reproducible problem with recording, editing, playback, or the desktop interface. / 报告可复现的录制、编辑、回放或界面问题。
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve KeyMouse Macro Recorder.
+
+        感谢你帮助改进 KeyMouse Macro Recorder。宏文件可能包含完整按键、屏幕坐标和操作时序，请勿上传包含密码、验证码、令牌、私钥或其他敏感信息的宏文件。
+
+        Please do not disclose security vulnerabilities here. Use the private reporting instructions in `SECURITY.md` instead.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting / 提交前确认
+      options:
+        - label: I searched existing issues and did not find the same problem. / 我已搜索现有 Issue，未发现相同问题。
+          required: true
+        - label: I removed all sensitive information from logs, screenshots, and sample macros. / 我已从日志、截图和示例宏中移除敏感信息。
+          required: true
+        - label: This is not a security vulnerability. / 这不是需要私下报告的安全漏洞。
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Application version / 应用版本
+      description: Use the GitHub Release tag, commit SHA, or write "source main". / 请填写 Release 标签、提交 SHA，或填写“source main”。
+      placeholder: v2.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: distribution
+    attributes:
+      label: How did you run it? / 运行方式
+      options:
+        - GitHub Release EXE / GitHub Release 可执行文件
+        - From source / 从源码运行
+        - Self-built EXE / 自行构建的可执行文件
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows environment / Windows 环境
+      description: Include Windows version, display scaling, and monitor layout when relevant. / 如相关，请包含 Windows 版本、显示缩放和显示器布局。
+      placeholder: Windows 11 24H2, 150% scaling, two monitors
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      placeholder: |
+        1. Start recording with F8...
+        2. Perform...
+        3. Start playback with F9...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / 预期行为
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / 实际行为
+      description: Include the exact error message when one is shown. / 如有错误提示，请包含完整文本。
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots / 日志或截图
+      description: Drag files here after removing sensitive information. Do not upload personal macro files. / 请先移除敏感信息；不要上传个人宏文件。
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context / 补充信息

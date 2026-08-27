@@ -58,7 +58,7 @@ Tkinter is normally included with Python for Windows. At runtime, the applicatio
 
 ### Use a release build
 
-The first official GitHub Release has not been published yet. Once available, you will be able to download the standalone `KeyMouseMacroRecorder.exe` from the repository's Releases page without installing Python.
+Download the standalone `KeyMouseMacroRecorder.exe` from [GitHub Releases](https://github.com/Farisland1625/key-mouse-macro-recorder/releases/latest). Python is not required.
 
 ### Create your first editable macro
 
