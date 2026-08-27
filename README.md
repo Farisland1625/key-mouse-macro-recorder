@@ -1,5 +1,9 @@
 # KeyMouse Macro Recorder
 
+<p align="right">
+  <strong>简体中文</strong> | <a href="README.en.md">English</a>
+</p>
+
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4.svg)
 [![License](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
 [![Windows CI](https://github.com/Farisland1625/key-mouse-macro-recorder/actions/workflows/ci.yml/badge.svg)](https://github.com/Farisland1625/key-mouse-macro-recorder/actions/workflows/ci.yml)
@@ -32,7 +36,7 @@ KeyMouse Macro Recorder 不把录制结果当成不可修改的黑盒。每一�
 - 保存录制时的虚拟桌面边界，并在显示器排列或尺寸变化时映射鼠标坐标。
 - 支持 0.01x–20x 速度、指定次数或持续循环，以及播放中的暂停、继续和停止。
 
-## 轻量部署：Python 标准库 + Tkinter + Windows ctypes，打包 exe 约 11 MB 
+## 轻量部署：Python 标准库 + Tkinter + Windows ctypes，打包 exe 约 11 MB
 
 ## 界面预览
 
