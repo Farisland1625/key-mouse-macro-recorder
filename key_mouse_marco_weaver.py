@@ -13,7 +13,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 
-APP_NAME = "KeyMouse Macro Recorder"
+APP_NAME = "KeyMouse Marco Weaver"
 VERSION = "2.1.0"
 SCHEMA_VERSION = 2
 UNDO_LIMIT = 20
@@ -120,6 +120,19 @@ def parse_repeat_settings(mode, text):
     return int(value)
 
 
+def parse_composition_speed(value):
+    """Return a valid per-file composition speed multiplier."""
+    if isinstance(value, bool):
+        raise ValueError("编排速度必须是数字")
+    try:
+        speed = float(str(value).strip())
+    except (TypeError, ValueError, OverflowError):
+        raise ValueError("编排速度必须是数字") from None
+    if not math.isfinite(speed) or not SPEED_MIN <= speed <= SPEED_MAX:
+        raise ValueError(f"编排速度必须在 {SPEED_MIN:g} 到 {SPEED_MAX:g} 之间")
+    return speed
+
+
 def move_list_item(items, source_index, target_index):
     """Return a copy with one item moved to another list position."""
     reordered = list(items)
@@ -138,12 +151,14 @@ def move_list_item(items, source_index, target_index):
 
 
 def compose_macro_events(sequence, target_screen=None):
-    """Concatenate macro event timelines according to a per-item repeat count.
+    """Concatenate macro timelines with per-item speed and repeat settings.
 
     Each sequence item is a mapping with ``events`` and optional ``repeat``
-    fields.  A macro's own timestamps are relative to the beginning of that
-    macro; the next item starts immediately after the previous item's final
-    event timestamp while preserving each macro's initial gap.
+    and ``speed`` fields.  A macro's own timestamps are relative to the
+    beginning of that macro; speed controls its playback timing (values above
+    1.0 play faster and values below 1.0 play slower), and the next item starts
+    immediately after the previous item's final event timestamp while
+    preserving each macro's initial gap.
     """
     if not sequence:
         raise ValueError("编排至少需要一个宏")
@@ -170,12 +185,16 @@ def compose_macro_events(sequence, target_screen=None):
             raise ValueError("编排次数必须是大于等于 1 的整数") from None
         if repeat < 1:
             raise ValueError("编排次数必须是大于等于 1 的整数")
-        duration = event_end_time(events[-1])
+        try:
+            speed = parse_composition_speed(item.get("speed", 1.0))
+        except ValueError as exc:
+            raise ValueError(f"第 {item_index + 1} 个宏{exc}") from None
+        duration = event_end_time(events[-1]) / speed
         source_screen = item.get("screen")
         for _ in range(repeat):
             for event in events:
                 copied = dict(event)
-                copied["t"] = cursor + float(event["t"])
+                copied["t"] = cursor + float(event["t"]) / speed
                 if copied.get("kind") == "mouse" and source_screen and target_screen:
                     copied["x"], copied["y"] = map_screen_point_between(
                         copied.get("x", 0), copied.get("y", 0), source_screen, target_screen
@@ -1389,7 +1408,9 @@ class MacroApp:
         ttk.Separator(action_row, orient="vertical").pack(side="left", fill="y", padx=12)
         ttk.Button(action_row, text="载入", width=4, style="Compact.TButton", command=self.load_macro).pack(side="left", padx=3)
         ttk.Button(action_row, text="保存", width=4, style="Compact.TButton", command=self.save_macro).pack(side="left", padx=3)
-        self.compose_button = ttk.Button(action_row, text="多文件编排", width=8, style="Compact.TButton", command=self.open_composer)
+        # Let ttk derive the width from the label so enlarged fonts cannot
+        # clip the final Chinese glyph in the fullscreen layout.
+        self.compose_button = ttk.Button(action_row, text="多文件编排", style="Compact.TButton", command=self.open_composer)
         self.compose_button.pack(side="left", padx=3)
         options_content = ttk.Frame(action_row, style="ToolbarInner.TFrame")
         options_content.pack(side="right", padx=(12, 0))
@@ -2791,7 +2812,7 @@ class MacroApp:
         ttk.Label(body, text="编排宏", style="Title.TLabel", font=title_font).grid(row=0, column=0, sticky="w")
         ttk.Label(
             body,
-            text="按播放顺序加入宏文件，为每一项设置次数；可按住列表项拖动排序。",
+            text="按播放顺序加入宏文件，为每一项设置倍速和次数；可按住列表项拖动排序。",
             style="Subtle.TLabel",
             font=text_font,
         ).grid(row=1, column=0, sticky="w", pady=(3, 12))
@@ -2799,18 +2820,19 @@ class MacroApp:
         items = []
         summary_var = tk.StringVar(value="尚未加入宏文件")
         path_var = tk.StringVar(value="选择一项可查看完整路径")
+        speed_var = tk.StringVar(value="1.0")
         repeat_var = tk.StringVar(value="1")
         current_index = [None]
-        syncing_repeat = [False]
+        syncing_fields = [False]
 
         tools = ttk.Frame(body)
         tools.grid(row=2, column=0, sticky="ew", pady=(0, 8))
         list_frame = ttk.Frame(body)
         list_frame.grid(row=3, column=0, sticky="nsew")
-        columns = ("order", "file", "repeat", "events", "duration")
+        columns = ("order", "file", "speed", "repeat", "events", "duration")
         tree = ttk.Treeview(list_frame, columns=columns, show="headings", selectmode="browse", height=9)
-        headings = {"order": "顺序", "file": "宏文件", "repeat": "次数", "events": "事件数", "duration": "单次时长"}
-        widths = {"order": 70, "file": 390, "repeat": 90, "events": 110, "duration": 130}
+        headings = {"order": "顺序", "file": "宏文件", "speed": "速度", "repeat": "次数", "events": "事件数", "duration": "单次时长"}
+        widths = {"order": 70, "file": 330, "speed": 90, "repeat": 90, "events": 110, "duration": 130}
         for column in columns:
             tree.heading(column, text=headings[column])
             tree.column(
@@ -2836,7 +2858,7 @@ class MacroApp:
 
         def update_summary():
             total_events = sum(len(item["events"]) * item["repeat"] for item in items)
-            total_time = sum(event_end_time(item["events"][-1]) * item["repeat"] for item in items)
+            total_time = sum(event_end_time(item["events"][-1]) / item["speed"] * item["repeat"] for item in items)
             if items:
                 summary_var.set(f"{len(items)} 个编排项 / {total_events} 个事件 / 约 {total_time:.2f} 秒")
             else:
@@ -2852,9 +2874,10 @@ class MacroApp:
                     values=(
                         index + 1,
                         item["path"].name,
+                        f"{item['speed']:g}x",
                         item["repeat"],
                         len(item["events"]),
-                        f"{event_end_time(item['events'][-1]):.2f} 秒",
+                        f"{event_end_time(item['events'][-1]) / item['speed']:.2f} 秒",
                     ),
                     tags=("even" if index % 2 == 0 else "odd",),
                 )
@@ -2867,19 +2890,36 @@ class MacroApp:
         def on_select(_event=None):
             index = selected_index()
             current_index[0] = index
-            syncing_repeat[0] = True
+            syncing_fields[0] = True
             try:
                 if index is None:
+                    speed_var.set("1.0")
                     repeat_var.set("1")
                     path_var.set("选择一项可查看完整路径")
                 else:
+                    speed_var.set(f"{items[index]['speed']:g}")
                     repeat_var.set(str(items[index]["repeat"]))
                     path_var.set(str(items[index]["path"]))
             finally:
-                syncing_repeat[0] = False
+                syncing_fields[0] = False
+
+        def on_speed_changed(*_args):
+            if syncing_fields[0]:
+                return
+            index = current_index[0]
+            if index is None:
+                return
+            try:
+                value = parse_composition_speed(speed_var.get())
+            except ValueError:
+                return
+            items[index]["speed"] = value
+            if tree.exists(str(index)):
+                tree.set(str(index), "speed", f"{value:g}x")
+            update_summary()
 
         def on_repeat_changed(*_args):
-            if syncing_repeat[0]:
+            if syncing_fields[0]:
                 return
             index = current_index[0]
             value = repeat_var.get().strip()
@@ -2910,7 +2950,7 @@ class MacroApp:
                 except Exception as exc:
                     errors.append(f"{path.name}：{exc}")
                     continue
-                items.append({"path": path, "payload": payload, "events": events, "repeat": 1})
+                items.append({"path": path, "payload": payload, "events": events, "speed": 1.0, "repeat": 1})
             refresh(first_added if len(items) > first_added else None)
             if errors:
                 messagebox.showerror(APP_NAME, "以下文件无法加入：\n\n" + "\n".join(errors), parent=dialog)
@@ -2948,6 +2988,10 @@ class MacroApp:
 
         editor = ttk.Frame(body, style="Toolbar.TFrame", padding=(12, 10))
         editor.grid(row=4, column=0, sticky="ew", pady=(10, 0))
+        ttk.Label(editor, text="所选项速度", style="Option.TLabel").pack(side="left")
+        validate_speed = self.root.register(self._validate_speed_input)
+        speed_entry = ttk.Entry(editor, textvariable=speed_var, width=8, style="Option.TEntry", font=text_font, validate="key", validatecommand=(validate_speed, "%P"))
+        speed_entry.pack(side="left", padx=(8, 14))
         ttk.Label(editor, text="所选项次数", style="Option.TLabel").pack(side="left")
         repeat_entry = ttk.Entry(editor, textvariable=repeat_var, width=10, style="Option.TEntry", font=text_font)
         repeat_entry.pack(side="left", padx=(8, 14))
@@ -2974,6 +3018,12 @@ class MacroApp:
                     repeat_entry.focus_set()
                     return
                 items[selected]["repeat"] = int(value)
+                try:
+                    items[selected]["speed"] = parse_composition_speed(speed_var.get())
+                except ValueError as exc:
+                    messagebox.showerror(APP_NAME, f"{exc}。", parent=dialog)
+                    speed_entry.focus_set()
+                    return
             macros_dir = Path(__file__).with_name("macros")
             macros_dir.mkdir(exist_ok=True)
             output_path = filedialog.asksaveasfilename(
@@ -2996,6 +3046,7 @@ class MacroApp:
                 sequence = [
                     {
                         "events": item["events"],
+                        "speed": item["speed"],
                         "repeat": item["repeat"],
                         "screen": item["payload"].get("screen"),
                     }
@@ -3016,7 +3067,21 @@ class MacroApp:
             )
             dialog.destroy()
 
+        def normalize_composition_speed(_event=None):
+            try:
+                value = float(speed_var.get().strip())
+            except (TypeError, ValueError, OverflowError):
+                value = 1.0
+            if not math.isfinite(value):
+                value = 1.0
+            value = min(SPEED_MAX, max(SPEED_MIN, value))
+            speed_var.set(f"{value:.2f}".rstrip("0").rstrip("."))
+            return "break" if _event is not None and getattr(_event, "keysym", "") == "Return" else None
+
+        speed_var.trace_add("write", on_speed_changed)
         repeat_var.trace_add("write", on_repeat_changed)
+        speed_entry.bind("<FocusOut>", lambda _event: normalize_composition_speed())
+        speed_entry.bind("<Return>", normalize_composition_speed)
         tree.bind("<<TreeviewSelect>>", on_select)
         tree.tag_configure("even", background="#151c24")
         tree.tag_configure("odd", background="#1b2028")

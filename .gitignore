@@ -20,6 +20,9 @@ dist/
 # Local recordings may contain coordinates and keyboard input.
 macros/
 
+# Local showcase and generated project artifacts
+projects/
+
 # Logs and editor metadata
 *.log
 .idea/

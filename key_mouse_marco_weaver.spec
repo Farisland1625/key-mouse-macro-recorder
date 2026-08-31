@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['macro_recorder.py'],
+    ['key_mouse_marco_weaver.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='KeyMouseMacroRecorder',
+    name='key_mouse_marco_weaver',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
