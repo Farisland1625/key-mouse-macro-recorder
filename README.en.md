@@ -1,4 +1,4 @@
-# KeyMouse Macro Recorder
+# KeyMouse Marco Weaver
 
 <p align="right">
   <a href="README.md">简体中文</a> | <strong>English</strong>
@@ -6,11 +6,11 @@
 
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4.svg)
 [![License](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
-[![Windows CI](https://github.com/Farisland1625/key-mouse-macro-recorder/actions/workflows/ci.yml/badge.svg)](https://github.com/Farisland1625/key-mouse-macro-recorder/actions/workflows/ci.yml)
+[![Windows CI](https://github.com/Farisland1625/key_mouse_marco_weaver/actions/workflows/ci.yml/badge.svg)](https://github.com/Farisland1625/key_mouse_marco_weaver/actions/workflows/ci.yml)
 
 A lightweight, editable, and composable keyboard and mouse macro recorder for Windows.
 
-KeyMouse Macro Recorder does not treat recordings as an unchangeable black box. Every keystroke, mouse movement, click, and scroll action appears on a visual timeline. You can inspect events, edit parameters, reorder steps, insert new events, and combine multiple macro files in a chosen order with independent repeat counts to build a new automation workflow.
+KeyMouse Marco Weaver does not treat recordings as an unchangeable black box. Every keystroke, mouse movement, click, and scroll action appears on a visual timeline. You can inspect events, edit parameters, reorder steps, insert new events, and combine multiple macro files in a chosen order with independent playback speeds and repeat counts to build a new automation workflow.
 
 ## Edit individual macro files: record, modify, or author them manually
 
@@ -25,7 +25,7 @@ KeyMouse Macro Recorder does not treat recordings as an unchangeable black box. 
 Complex operations do not need to become one long, difficult-to-maintain macro. Save several short macros with focused responsibilities, then use **Multi-file composition** to generate a new standard macro file:
 
 - Add the same macro or different macros in any order.
-- Set an independent playback count for each item.
+- Set an independent playback speed (`0.01x` to `20x`) and repeat count for each item.
 - Drag macro files to reorder the composition, or move and remove items with the buttons while seeing the combined event count and duration immediately.
 - Map mouse coordinates from source macros to the current virtual desktop when monitor layouts differ.
 
@@ -40,7 +40,7 @@ Complex operations do not need to become one long, difficult-to-maintain macro. 
 
 ## Interface preview
 
-![Timeline editor and event properties in KeyMouse Macro Recorder](docs/images/keymouse-macro-recorder-main-window.png)
+![Timeline editor and event properties in KeyMouse Marco Weaver](docs/images/key_mouse_marco_weaver-main-window.png)
 
 ## Quick start
 
@@ -49,16 +49,16 @@ Complex operations do not need to become one long, difficult-to-maintain macro. 
 Requires Windows 10/11 and Python 3.10 or later:
 
 ```powershell
-git clone https://github.com/Farisland1625/key-mouse-macro-recorder.git
-cd key-mouse-macro-recorder
-python macro_recorder.py
+git clone https://github.com/Farisland1625/key_mouse_marco_weaver.git
+cd key_mouse_marco_weaver
+python key_mouse_marco_weaver.py
 ```
 
 Tkinter is normally included with Python for Windows. At runtime, the application uses only the Python standard library, Tkinter, and native Windows APIs, with no third-party runtime packages required.
 
 ### Use a release build
 
-Download the standalone `KeyMouseMacroRecorder.exe` from [GitHub Releases](https://github.com/Farisland1625/key-mouse-macro-recorder/releases/latest). Python is not required.
+Download the standalone `key_mouse_marco_weaver.exe` from [GitHub Releases](https://github.com/Farisland1625/key_mouse_marco_weaver/releases/latest). Python is not required.
 
 ### Create your first editable macro
 
@@ -76,7 +76,7 @@ See [`examples/basic_click.json`](examples/basic_click.json) for a sanitized for
 1. Record, edit, and save the short macros you want to reuse.
 2. Click **Multi-file composition** in the top toolbar.
 3. Add macro files in execution order; the same file can be added more than once.
-4. Set the playback count for each item, then drag to reorder or use the move and remove buttons as needed.
+4. Set the playback speed and repeat count for each item, then drag to reorder or use the move and remove buttons as needed.
 5. Save the composition. The application creates a new schema 2 macro file and leaves every source file unchanged.
 
 ## Macro format and privacy
@@ -110,27 +110,27 @@ python -m venv .venv_user
 powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
 ```
 
-The output is `dist\KeyMouseMacroRecorder.exe`. The `build/`, `dist/`, and virtual environment directories are excluded by `.gitignore`. Distribute binaries through GitHub Releases instead of committing build artifacts to source history.
+The output is `dist\key_mouse_marco_weaver.exe`. The `build/`, `dist/`, and virtual environment directories are excluded by `.gitignore`. Distribute binaries through GitHub Releases instead of committing build artifacts to source history.
 
 ## Development and verification
 
 ```powershell
 .\.venv_user\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv_user\Scripts\python.exe -m py_compile macro_recorder.py tests\test_macro_format.py
+.\.venv_user\Scripts\python.exe -m py_compile key_mouse_marco_weaver.py tests\test_macro_format.py
 ```
 
-The current baseline contains 43 core logic tests and has been verified with a PyInstaller one-file build. GitHub Actions runs the tests and syntax checks on Python 3.10 and 3.12 for pushes and Pull Requests, and verifies the one-file build on Python 3.12.
+The current baseline contains 46 core logic tests and has been verified with a PyInstaller one-file build. GitHub Actions runs the tests and syntax checks on Python 3.10 and 3.12 for pushes and Pull Requests, and verifies the one-file build on Python 3.12.
 
 Reproducible bug reports, accuracy cases, timeline editing suggestions, and UI improvements are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before contributing code, and report security issues privately as described in [`SECURITY.md`](SECURITY.md).
 
 ## Project structure
 
 ```text
-macro_recorder.py          # Windows GUI, recording, editing, playback, and JSON format
+key_mouse_marco_weaver.py # Windows GUI, recording, editing, playback, and JSON format
 tests/                     # Headless core logic tests
 examples/                  # Sanitized example macros
 build_exe.ps1              # PyInstaller build script
-KeyMouseMacroRecorder.spec # PyInstaller configuration
+key_mouse_marco_weaver.spec # PyInstaller configuration
 requirements-dev.txt       # Development dependencies used only for builds
 ```
 

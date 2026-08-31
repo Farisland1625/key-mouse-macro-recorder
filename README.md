@@ -1,4 +1,4 @@
-# KeyMouse Macro Recorder
+# KeyMouse Marco Weaver
 
 <p align="right">
   <strong>简体中文</strong> | <a href="README.en.md">English</a>
@@ -6,11 +6,11 @@
 
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4.svg)
 [![License](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
-[![Windows CI](https://github.com/Farisland1625/key-mouse-macro-recorder/actions/workflows/ci.yml/badge.svg)](https://github.com/Farisland1625/key-mouse-macro-recorder/actions/workflows/ci.yml)
+[![Windows CI](https://github.com/Farisland1625/key_mouse_marco_weaver/actions/workflows/ci.yml/badge.svg)](https://github.com/Farisland1625/key_mouse_marco_weaver/actions/workflows/ci.yml)
 
 一个轻量、可编辑、可组合的 Windows 键鼠宏录制器。
 
-KeyMouse Macro Recorder 不把录制结果当成不可修改的黑盒。每一次按键、鼠标移动、点击和滚轮操作都会进入可视时间轴：你可以检查事件、修改参数、调整顺序、直接插入新事件，也可以把多个宏文件按顺序和次数编排成一条新的自动化流程。
+KeyMouse Marco Weaver 不把录制结果当成不可修改的黑盒。每一次按键、鼠标移动、点击和滚轮操作都会进入可视时间轴：你可以检查事件、修改参数、调整顺序、直接插入新事件，也可以把多个宏文件按顺序、倍速和次数编排成一条新的自动化流程。
 
 ## 单个宏文件编辑：录制、修改与自行编写
 
@@ -25,7 +25,7 @@ KeyMouse Macro Recorder 不把录制结果当成不可修改的黑盒。每一�
 复杂操作不必录成一个难以维护的超长宏。你可以先保存多个短小、职责清晰的宏，再通过“多文件编排”生成新的标准宏文件：
 
 - 按需要的顺序加入同一个或不同的宏文件。
-- 为每个编排项设置独立播放次数。
+- 为每个编排项设置独立播放速度和次数（速度范围 `0.01x–20x`）。
 - 直接拖动宏文件调整编排顺序，也可上移、下移或删除，并实时查看合成后的事件数与总时长。
 - 在显示器布局不同的情况下，将源宏鼠标坐标映射到当前虚拟桌面。
 
@@ -40,7 +40,7 @@ KeyMouse Macro Recorder 不把录制结果当成不可修改的黑盒。每一�
 
 ## 界面预览
 
-![KeyMouse Macro Recorder 的时间轴编辑与事件属性界面](docs/images/keymouse-macro-recorder-main-window.png)
+![KeyMouse Marco Weaver 的时间轴编辑与事件属性界面](docs/images/key_mouse_marco_weaver-main-window.png)
 
 ## 快速开始
 
@@ -49,16 +49,16 @@ KeyMouse Macro Recorder 不把录制结果当成不可修改的黑盒。每一�
 要求 Windows 10/11 和 Python 3.10 或更高版本：
 
 ```powershell
-git clone https://github.com/Farisland1625/key-mouse-macro-recorder.git
-cd key-mouse-macro-recorder
-python macro_recorder.py
+git clone https://github.com/Farisland1625/key_mouse_marco_weaver.git
+cd key_mouse_marco_weaver
+python key_mouse_marco_weaver.py
 ```
 
 Tkinter 通常随 Windows 版 Python 一起安装。程序运行时只使用 Python 标准库、Tkinter 和 Windows 原生 API，不需要安装第三方运行时包。
 
 ### 使用发布版
 
-从 [GitHub Releases](https://github.com/Farisland1625/key-mouse-macro-recorder/releases/latest) 下载单文件 `KeyMouseMacroRecorder.exe`，无需安装 Python。
+从 [GitHub Releases](https://github.com/Farisland1625/key_mouse_marco_weaver/releases/latest) 下载单文件 `key_mouse_marco_weaver.exe`，无需安装 Python。
 
 ### 完成第一个可编辑宏
 
@@ -76,7 +76,7 @@ Tkinter 通常随 Windows 版 Python 一起安装。程序运行时只使用 Pyt
 1. 先分别录制、编辑并保存需要复用的短宏。
 2. 点击顶部的“多文件编排”。
 3. 按执行顺序加入宏文件；同一文件可以加入多次。
-4. 为每一项设置播放次数，并根据需要直接拖动排序，或使用上移、下移和删除。
+4. 为每一项设置播放速度和次数，并根据需要直接拖动排序，或使用上移、下移和删除。
 5. 保存编排结果。程序会生成新的 schema 2 宏文件，所有源文件保持不变。
 
 ## 宏文件格式与隐私
@@ -110,27 +110,27 @@ python -m venv .venv_user
 powershell -ExecutionPolicy Bypass -File .\build_exe.ps1
 ```
 
-输出为 `dist\KeyMouseMacroRecorder.exe`。`build/`、`dist/` 和虚拟环境均被 `.gitignore` 排除；建议通过 GitHub Releases 分发二进制，而不是把构建产物提交到源码历史。
+输出为 `dist\key_mouse_marco_weaver.exe`。`build/`、`dist/` 和虚拟环境均被 `.gitignore` 排除；建议通过 GitHub Releases 分发二进制，而不是把构建产物提交到源码历史。
 
 ## 开发与验证
 
 ```powershell
 .\.venv_user\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv_user\Scripts\python.exe -m py_compile macro_recorder.py tests\test_macro_format.py
+.\.venv_user\Scripts\python.exe -m py_compile key_mouse_marco_weaver.py tests\test_macro_format.py
 ```
 
-当前基线包含 43 项核心逻辑测试，并已验证 PyInstaller onefile 构建。GitHub Actions 会在 Push 和 Pull Request 中使用 Python 3.10 / 3.12 运行测试与语法检查，并在 Python 3.12 下验证 onefile 构建。
+当前基线包含 46 项核心逻辑测试，并已验证 PyInstaller onefile 构建。GitHub Actions 会在 Push 和 Pull Request 中使用 Python 3.10 / 3.12 运行测试与语法检查，并在 Python 3.12 下验证 onefile 构建。
 
 欢迎提交可复现的问题、精度案例、时间轴编辑建议和 UI 改进。贡献代码前请阅读 [`CONTRIBUTING.md`](CONTRIBUTING.md)；安全问题请按 [`SECURITY.md`](SECURITY.md) 私下报告。
 
 ## 项目结构
 
 ```text
-macro_recorder.py          # Windows GUI、录制、编辑、回放和 JSON 格式
+key_mouse_marco_weaver.py # Windows GUI、录制、编辑、回放和 JSON 格式
 tests/                     # 无窗口核心逻辑测试
 examples/                  # 脱敏示例宏
 build_exe.ps1              # PyInstaller 构建脚本
-KeyMouseMacroRecorder.spec # PyInstaller 配置
+key_mouse_marco_weaver.spec # PyInstaller 配置
 requirements-dev.txt       # 仅构建所需的开发依赖
 ```
 

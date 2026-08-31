@@ -1,6 +1,6 @@
 # Contributing
 
-感谢你愿意参与 KeyMouse Macro Recorder。项目优先接受能够复现、测试覆盖清晰、且保持 Windows 原生轻量路线的改动。
+感谢你愿意参与 KeyMouse Marco Weaver。项目优先接受能够复现、测试覆盖清晰、且保持 Windows 原生轻量路线的改动。
 
 ## 开发环境
 
@@ -22,7 +22,7 @@ python -m venv .venv_user
 
 ```powershell
 .\\.venv_user\\Scripts\\python.exe -m unittest discover -s tests -v
-.\\.venv_user\\Scripts\\python.exe -m py_compile macro_recorder.py tests\\test_macro_format.py
+.\\.venv_user\\Scripts\\python.exe -m py_compile key_mouse_marco_weaver.py tests\\test_macro_format.py
 ```
 
 需要验证打包时运行：

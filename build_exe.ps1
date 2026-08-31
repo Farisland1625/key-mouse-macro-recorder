@@ -15,8 +15,8 @@ $PyInstallerArgs = @(
     "--clean",
     "--onefile",
     "--windowed",
-    "--name", "KeyMouseMacroRecorder",
-    "macro_recorder.py"
+    "--name", "key_mouse_marco_weaver",
+    "key_mouse_marco_weaver.py"
 )
 
 & $Python -m PyInstaller @PyInstallerArgs
@@ -25,4 +25,4 @@ if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller build failed with exit code: $LASTEXITCODE"
 }
 
-Write-Host "Built: dist\KeyMouseMacroRecorder.exe"
+Write-Host "Built: dist\key_mouse_marco_weaver.exe"
